@@ -46,14 +46,14 @@ fn compute_match_length(string: &str, query: &str) -> usize {
 // Creates a regex for performing a case-insensitive non-greedy fuzzy match.
 // Turns "abc" into "(?i)a.*?b.*?c.*?".
 fn make_query_regex(query: &str) -> String {
-    let mut v = query
+    let mut parts = query
         .chars()
         .map(|ch| regex::quote(ch.to_string().as_slice()))
         .collect::<Vec<String>>();
 
-    v.insert(0, String::from_str("(?i)"));
+    parts.insert(0, String::from_str("(?i)"));
 
-    return v.connect(".*?");
+    return parts.connect(".*?");
 }
 
 #[cfg(test)]
@@ -118,6 +118,16 @@ mod test {
     #[test]
     fn it_doesnt_match_when_the_same_letter_is_repeated_in_the_choice() {
         assert_eq!(super::score("a", "aa"), 0f64);
+    }
+
+    #[test]
+    fn it_scores_higher_for_better_matches() {
+        assert!(super::score("selecta.gemspec", "asp")
+                > super::score("algorithm4_spec.rb", "asp"));
+        assert!(super::score("README.md", "em")
+                > super::score("benchmark.rb", "em"));
+        assert!(super::score("search.rb", "sear")
+                > super::score("spec/search_spec.rb", "sear"));
     }
 }
 
