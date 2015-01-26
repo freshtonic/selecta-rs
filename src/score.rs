@@ -7,35 +7,50 @@ use std::slice::SliceConcatExt;
 use self::core::str::StrExt;
 use self::regex::Regex;
 
-pub fn score(choice: &str, query: &str) -> u32 {
+pub fn score(choice: &str, query: &str) -> usize {
+    println!("HELLO!");
     if choice == "" || query.char_len() > choice.char_len() {
-        0
+        println!("RETURNING 0");
+        0us
     } else if query == "" {
-        1
+        println!("RETURNING 1");
+        1us
     } else {
+        println!("COMPUTING MATCH LEN");
         compute_match_length(choice, query)
     }
 }
 
 // Find the length of the shortest substring matching the given characters.
-fn compute_match_length(string: &str, query: &str) -> u32 {
+fn compute_match_length(string: &str, query: &str) -> usize {
+    println!("WTF 1");
     let re_string = make_query_regex(query);
+    println!("REGEX: {}", re_string);
     let re = match Regex::new(re_string.as_slice()) {
         Ok(re)   => re,
         Err(err) => panic!("{}", err.msg),
     };
 
-    1
+    if re.is_match(string) {
+        let caps = re.captures(string).unwrap();
+        match caps.at(0) {
+            Some(s) => return s.char_len(),
+            None    => { println!("DID NOT MATCH"); return 0us }
+        };
+    } else {
+        println!("NOT A MATCH!"); 
+        return 0us;
+    }
 }
 
-
-// Creates a regex for performing a non-greedy match.
-// Transforms a user-supplied query such as "abc" into "a.*?b.*?c.*?".
+// Creates a regex for performing a non-greedy fuzzy match.
+// Turns "abc" into ".*a.*?b.*?c.*?".
 fn make_query_regex(query: &str) -> String {
-    let s = String::from_str(query);
-    let v = vec!(s);
-    let c = v.connect(",");
-    return String::from_str(c.as_slice());
+    return query
+        .chars()
+        .map(|ch| ch.to_string())
+        .collect::<Vec<String>>()
+        .connect(".*?");
 }
 
 #[cfg(test)]
@@ -58,19 +73,17 @@ mod test {
 
     #[test]
     fn scores_zero_when_only_a_prefix_of_the_query_matches() {
-        assert_eq!(super::score("ab", "ac"), 0);
+        assert_eq!(super::score("ab", "ac"), 0us);
     }
 
     #[test]
     fn scores_greater_than_zero_when_it_matches() {
-        //assert!(super::score("a", "a") > 0);
-
-
-        //expect(score("a", "a")).to be > 0
-        //expect(score("ab", "a")).to be > 0
-        //expect(score("ba", "a")).to be > 0
-        //expect(score("bab", "a")).to be > 0
-        //expect(score("babababab", "aaaa")).to be > 0
+        assert!(super::score("a", "a") > 0us);
+        assert!(super::score("ab", "a") > 0us);
+        assert!(super::score("ba", "a") > 0us);
+        assert!(super::score("bab", "a") > 0us);
+        println!("SCORE: {}", super::score("babababab", "aaaa"));
+        assert!(super::score("babababab", "aaaa") > 0us);
     }
 }
 
