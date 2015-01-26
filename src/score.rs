@@ -28,7 +28,7 @@ pub fn score(choice: &str, query: &str) -> f64 {
 fn compute_match_length(string: &str, query: &str) -> usize {
     let re_string = make_query_regex(query);
     let re = match Regex::new(re_string.as_slice()) {
-        Ok(re)   => re,
+        Ok(re)   => { println!("RE: {}", re); re},
         Err(err) => panic!("{}", err.msg),
     };
 
@@ -43,14 +43,17 @@ fn compute_match_length(string: &str, query: &str) -> usize {
     }
 }
 
-// Creates a regex for performing a non-greedy fuzzy match.
-// Turns "abc" into "a.*?b.*?c.*?".
+// Creates a regex for performing a case-insensitive non-greedy fuzzy match.
+// Turns "abc" into "(?i)a.*?b.*?c.*?".
 fn make_query_regex(query: &str) -> String {
-    return query
+    let mut v = query
         .chars()
-        .map(|ch| ch.to_string())
-        .collect::<Vec<String>>()
-        .connect(".*?");
+        .map(|ch| regex::quote(ch.to_string().as_slice()))
+        .collect::<Vec<String>>();
+
+    v.insert(0, String::from_str("(?i)"));
+
+    return v.connect(".*?");
 }
 
 #[cfg(test)]
@@ -97,6 +100,19 @@ mod test {
 
         assert_eq!(super::score("spec/search_spec.rb", "sear"),
             1.0f64 / ("spec/search_spec.rb".char_len().to_f64().unwrap()));
+    }
+
+    // Character matching
+
+    #[test]
+    fn it_matches_punctuation() {
+        assert!(super::score("/! symbols $^", "/!$^") > 0f64);
+    }
+
+    #[test]
+    fn it_is_case_insensitive() {
+      assert_eq!(super::score("a", "A"), 1f64);
+      assert_eq!(super::score("A", "a"), 1f64);
     }
 }
 
