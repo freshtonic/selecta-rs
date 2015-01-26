@@ -6,26 +6,27 @@ use std::str;
 use std::slice::SliceConcatExt;
 use self::core::str::StrExt;
 use self::regex::Regex;
+use std::num::ToPrimitive;
 
-pub fn score(choice: &str, query: &str) -> usize {
-    println!("HELLO!");
+pub fn score(choice: &str, query: &str) -> f64 {
     if choice == "" || query.char_len() > choice.char_len() {
-        println!("RETURNING 0");
-        0us
+        0f64
     } else if query == "" {
-        println!("RETURNING 1");
-        1us
+        1f64
     } else {
-        println!("COMPUTING MATCH LEN");
-        compute_match_length(choice, query)
+        let match_length = compute_match_length(choice, query);
+
+        if match_length > 0 {
+            return 1f64 / choice.char_len().to_f64().unwrap();
+        } else {
+            return 0f64;
+        }
     }
 }
 
 // Find the length of the shortest substring matching the given characters.
 fn compute_match_length(string: &str, query: &str) -> usize {
-    println!("WTF 1");
     let re_string = make_query_regex(query);
-    println!("REGEX: {}", re_string);
     let re = match Regex::new(re_string.as_slice()) {
         Ok(re)   => re,
         Err(err) => panic!("{}", err.msg),
@@ -35,16 +36,15 @@ fn compute_match_length(string: &str, query: &str) -> usize {
         let caps = re.captures(string).unwrap();
         match caps.at(0) {
             Some(s) => return s.char_len(),
-            None    => { println!("DID NOT MATCH"); return 0us }
+            None    => return 0
         };
     } else {
-        println!("NOT A MATCH!"); 
-        return 0us;
+        return 0;
     }
 }
 
 // Creates a regex for performing a non-greedy fuzzy match.
-// Turns "abc" into ".*a.*?b.*?c.*?".
+// Turns "abc" into "a.*?b.*?c.*?".
 fn make_query_regex(query: &str) -> String {
     return query
         .chars()
@@ -56,34 +56,47 @@ fn make_query_regex(query: &str) -> String {
 #[cfg(test)]
 mod test {
 
+    use super::core::str::StrExt;
+    use std::num::ToPrimitive;
+
     #[test]
     fn scores_zero_when_the_choice_is_empty() {
-        assert_eq!(super::score("", ""), 0);
+        assert_eq!(super::score("", ""), 0f64);
     }
 
     #[test]
     fn scores_one_when_the_query_is_empty() {
-        assert_eq!(super::score("a", ""), 1);
+        assert_eq!(super::score("a", ""), 1f64);
     }
 
     #[test]
     fn scores_zero_when_the_query_is_longer_than_the_choice() {
-        assert_eq!(super::score("short", "longer"), 0);
+        assert_eq!(super::score("short", "longer"), 0f64);
     }
 
     #[test]
     fn scores_zero_when_only_a_prefix_of_the_query_matches() {
-        assert_eq!(super::score("ab", "ac"), 0us);
+        assert_eq!(super::score("ab", "ac"), 0f64);
     }
 
     #[test]
     fn scores_greater_than_zero_when_it_matches() {
-        assert!(super::score("a", "a") > 0us);
-        assert!(super::score("ab", "a") > 0us);
-        assert!(super::score("ba", "a") > 0us);
-        assert!(super::score("bab", "a") > 0us);
-        println!("SCORE: {}", super::score("babababab", "aaaa"));
-        assert!(super::score("babababab", "aaaa") > 0us);
+        assert!(super::score("a", "a") > 0f64);
+        assert!(super::score("ab", "a") > 0f64);
+        assert!(super::score("ba", "a") > 0f64);
+        assert!(super::score("bab", "a") > 0f64);
+        assert!(super::score("babababab", "aaaa") > 0f64);
+    }
+
+    #[test]
+    fn scores_one_normalized_to_length_when_the_query_equals_the_choice() {
+        assert_eq!(super::score("a", "a"), 1.0f64);
+        assert_eq!(super::score("ab", "ab"), 0.5f64);
+        assert_eq!(super::score("a long string", "a long string"),
+            1.0f64 / ("a long string".char_len().to_f64().unwrap()));
+
+        assert_eq!(super::score("spec/search_spec.rb", "sear"),
+            1.0f64 / ("spec/search_spec.rb".char_len().to_f64().unwrap()));
     }
 }
 
