@@ -111,8 +111,13 @@ mod test {
 
     #[test]
     fn it_is_case_insensitive() {
-      assert_eq!(super::score("a", "A"), 1f64);
-      assert_eq!(super::score("A", "a"), 1f64);
+        assert_eq!(super::score("a", "A"), 1f64);
+        assert_eq!(super::score("A", "a"), 1f64);
+    }
+
+    #[test]
+    fn it_doesnt_match_when_the_same_letter_is_repeated_in_the_choice() {
+        assert_eq!(super::score("a", "aa"), 0f64);
     }
 }
 
