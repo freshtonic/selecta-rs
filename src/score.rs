@@ -17,9 +17,9 @@ pub fn score(choice: &str, query: &str) -> f64 {
         let match_length = compute_match_length(choice, query);
 
         if match_length > 0 {
-            return 1f64 / choice.char_len().to_f64().unwrap();
+            1f64 / choice.char_len().to_f64().unwrap()
         } else {
-            return 0f64;
+            0f64
         }
     }
 }
@@ -28,18 +28,18 @@ pub fn score(choice: &str, query: &str) -> f64 {
 fn compute_match_length(string: &str, query: &str) -> usize {
     let re_string = make_query_regex(query);
     let re = match Regex::new(re_string.as_slice()) {
-        Ok(re)   => { println!("RE: {}", re); re},
+        Ok(re)   => re,
         Err(err) => panic!("{}", err.msg),
     };
 
     if re.is_match(string) {
         let caps = re.captures(string).unwrap();
         match caps.at(0) {
-            Some(s) => return s.char_len(),
-            None    => return 0
+            Some(s) => return s.char_len().to_uint().unwrap(),
+            None    => return 0us
         };
     } else {
-        return 0;
+        0us
     }
 }
 
@@ -53,7 +53,7 @@ fn make_query_regex(query: &str) -> String {
 
     parts.insert(0, String::from_str("(?i)"));
 
-    return parts.connect(".*?");
+    parts.connect(".*?")
 }
 
 #[cfg(test)]
