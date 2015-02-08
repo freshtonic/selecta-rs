@@ -28,6 +28,7 @@ impl<'a> Configuration<'a> {
 mod test {
 
     use super::Configuration;
+    use std::io::File;
 
     // Choices
 
@@ -39,5 +40,19 @@ mod test {
             21us
         );
         assert_eq!(config.choices(), vec!["a choice"]);
+    }
+
+    #[test]
+    fn it_silences_invalid_UTF_characters() {
+        let path = Path::new("invalid_utf8.txt");
+        let display = path.display();
+        let mut file = match File::open(&path) {
+            Err(why) => panic!("couldn't open {}: {}", display, why.desc),
+            Ok(file) => file
+        };
+        match file.read_to_string() {
+            Err(why) => assert_eq!("invalid input", why.desc),
+            Ok(string) => panic!("should not have been able to read invalid_utf8.txt successfully!") 
+        }
     }
 }
