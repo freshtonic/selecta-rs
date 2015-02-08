@@ -59,46 +59,47 @@ fn make_query_regex(query: &str) -> String {
 #[cfg(test)]
 mod test {
 
+    use super::score;
     use super::core::str::StrExt;
     use std::num::ToPrimitive;
 
     #[test]
     fn scores_zero_when_the_choice_is_empty() {
-        assert_eq!(super::score("", ""), 0f64);
+        assert_eq!(score("", ""), 0f64);
     }
 
     #[test]
     fn scores_one_when_the_query_is_empty() {
-        assert_eq!(super::score("a", ""), 1f64);
+        assert_eq!(score("a", ""), 1f64);
     }
 
     #[test]
     fn scores_zero_when_the_query_is_longer_than_the_choice() {
-        assert_eq!(super::score("short", "longer"), 0f64);
+        assert_eq!(score("short", "longer"), 0f64);
     }
 
     #[test]
     fn scores_zero_when_only_a_prefix_of_the_query_matches() {
-        assert_eq!(super::score("ab", "ac"), 0f64);
+        assert_eq!(score("ab", "ac"), 0f64);
     }
 
     #[test]
     fn scores_greater_than_zero_when_it_matches() {
-        assert!(super::score("a", "a") > 0f64);
-        assert!(super::score("ab", "a") > 0f64);
-        assert!(super::score("ba", "a") > 0f64);
-        assert!(super::score("bab", "a") > 0f64);
-        assert!(super::score("babababab", "aaaa") > 0f64);
+        assert!(score("a", "a") > 0f64);
+        assert!(score("ab", "a") > 0f64);
+        assert!(score("ba", "a") > 0f64);
+        assert!(score("bab", "a") > 0f64);
+        assert!(score("babababab", "aaaa") > 0f64);
     }
 
     #[test]
     fn scores_one_normalized_to_length_when_the_query_equals_the_choice() {
-        assert_eq!(super::score("a", "a"), 1.0f64);
-        assert_eq!(super::score("ab", "ab"), 0.5f64);
-        assert_eq!(super::score("a long string", "a long string"),
+        assert_eq!(score("a", "a"), 1.0f64);
+        assert_eq!(score("ab", "ab"), 0.5f64);
+        assert_eq!(score("a long string", "a long string"),
             1.0f64 / ("a long string".char_len().to_f64().unwrap()));
 
-        assert_eq!(super::score("spec/search_spec.rb", "sear"),
+        assert_eq!(score("spec/search_spec.rb", "sear"),
             1.0f64 / ("spec/search_spec.rb".char_len().to_f64().unwrap()));
     }
 
@@ -106,28 +107,28 @@ mod test {
 
     #[test]
     fn it_matches_punctuation() {
-        assert!(super::score("/! symbols $^", "/!$^") > 0f64);
+        assert!(score("/! symbols $^", "/!$^") > 0f64);
     }
 
     #[test]
     fn it_is_case_insensitive() {
-        assert_eq!(super::score("a", "A"), 1f64);
-        assert_eq!(super::score("A", "a"), 1f64);
+        assert_eq!(score("a", "A"), 1f64);
+        assert_eq!(score("A", "a"), 1f64);
     }
 
     #[test]
     fn it_doesnt_match_when_the_same_letter_is_repeated_in_the_choice() {
-        assert_eq!(super::score("a", "aa"), 0f64);
+        assert_eq!(score("a", "aa"), 0f64);
     }
 
     #[test]
     fn it_scores_higher_for_better_matches() {
-        assert!(super::score("selecta.gemspec", "asp")
-                > super::score("algorithm4_spec.rb", "asp"));
-        assert!(super::score("README.md", "em")
-                > super::score("benchmark.rb", "em"));
-        assert!(super::score("search.rb", "sear")
-                > super::score("spec/search_spec.rb", "sear"));
+        assert!(score("selecta.gemspec", "asp")
+                > score("algorithm4_spec.rb", "asp"));
+        assert!(score("README.md", "em")
+                > score("benchmark.rb", "em"));
+        assert!(score("search.rb", "sear")
+                > score("spec/search_spec.rb", "sear"));
     }
 }
 
