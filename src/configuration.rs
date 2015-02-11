@@ -28,7 +28,7 @@ impl<'a> Configuration<'a> {
 mod test {
 
     use super::Configuration;
-    use std::io::File;
+    use std::old_io::File;
 
     // Choices
 
