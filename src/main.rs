@@ -1,4 +1,3 @@
-
 #![allow(unstable)]
 #![feature(box_syntax)]
 
@@ -7,5 +6,5 @@ mod score;
 
 mod configuration;
 
-// fn main() {
-// }
+fn main() {
+}
