@@ -4,3 +4,5 @@ name = "selecta"
 version = "0.0.1"
 authors = ["James Sadler <freshtonic@gmail.com>"]
 
+[dependencies]
+regex = "0.1.14"
