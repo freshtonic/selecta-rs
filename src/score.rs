@@ -18,6 +18,7 @@ pub fn score(choice: &String, query: &String) -> f32 {
 
 // Find the length of the shortest substring matching the given characters.
 fn compute_match_length(string: &String, query: &String) -> usize {
+    // FIXME (performance). Regexp is not reused.
     let re_string = &make_query_regex(query);
     let re = match regex::Regex::new(re_string.as_slice()) {
         Ok(re)   => re,
