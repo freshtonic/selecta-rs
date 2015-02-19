@@ -25,16 +25,9 @@ fn compute_match_length(string: &String, query: &String) -> usize {
         Ok(re)   => re,
         Err(err) => panic!("{}", err.msg),
     };
-
-    // TODO: remove the outer if
-    if re.is_match(string.as_slice()) {
-        let caps = re.captures(string.as_slice()).unwrap();
-        match caps.at(0) {
-            Some(s) => return s.char_len() as usize,
-            None    => return 0us
-        };
-    } else {
-        0us
+    match re.captures(string.as_slice()) {
+        Some(caps) => caps.at(0).unwrap_or("").char_len(),
+        None       => 0
     }
 }
 
