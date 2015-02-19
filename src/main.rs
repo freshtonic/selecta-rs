@@ -1,10 +1,12 @@
 
 #![allow(unstable)]
 #![feature(box_syntax)]
+#![allow(unused_imports)]
 
-#[allow(unused_imports)]
-mod score;
+extern crate selecta_rs;
 
+use selecta_rs::score;
 
-// fn main() {
-// }
+fn main() {
+    println!("selecta-rs 0.0.1");
+}
