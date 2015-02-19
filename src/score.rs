@@ -8,9 +8,7 @@ pub fn score(choice: &String, query: &String) -> f32 {
     } else if query.len() == 0 {
         1.0
     } else {
-        let match_length = compute_match_length(choice, query);
-
-        if match_length > 0 {
+        if compute_match_length(choice, query) > 0 {
             1.0 / choice.len() as f32
         } else {
             0.0
