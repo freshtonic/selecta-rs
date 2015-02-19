@@ -3,7 +3,7 @@ use core::str::StrExt;
 use regex;
 
 pub fn score(choice: &String, query: &String) -> f32 {
-    if choice.len() == 0 || query.len() > choice.len() {
+    if choice.len() == 0 {
         0.0
     } else if query.len() == 0 {
         1.0
