@@ -21,7 +21,7 @@ fn compute_match_length(string: &String, query: &String) -> usize {
     let re_string = &make_query_regex(query);
     let re = match regex::Regex::new(re_string.as_slice()) {
         Ok(re)   => re,
-        Err(err) => panic!("{}", err.msg),
+        Err(err) => panic!("{}", err.msg)
     };
     match re.captures(string.as_slice()) {
         Some(caps) => caps.at(0).unwrap_or("").char_len(),
