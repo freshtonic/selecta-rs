@@ -17,14 +17,14 @@ pub fn score(choice: &String, query: &String) -> f32 {
 }
 
 // Find the length of the shortest substring matching the given characters.
-fn compute_match_length(string: &String, query: &String) -> usize {
+fn compute_match_length(choice: &String, query: &String) -> usize {
     // FIXME (performance). Regexp is not reused.
     let re_string = &make_query_regex(query);
     let re = match regex::Regex::new(re_string.as_slice()) {
         Ok(re)   => re,
         Err(err) => panic!("{}", err.msg)
     };
-    match re.captures(string.as_slice()) {
+    match re.captures(choice.as_slice()) {
         Some(caps) => caps.at(0).unwrap_or("").char_len(),
         None       => 0
     }
