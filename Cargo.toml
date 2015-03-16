@@ -9,3 +9,6 @@ name = "selecta_rs"
 doctest = false
 test = true
 doc = false
+
+[dependencies]
+regex = "0.1.20"
