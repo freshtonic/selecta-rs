@@ -6,7 +6,7 @@ because it's small, easy to understand and well-specced.
 
 # Requirements
 
-The latest Rust and Cargo versions must be installed. Update the to the latest combined Rust and Cargo Nightly build regularly with the command: ```curl -sS https://static.rust-lang.org/rustup.sh | sudo bash```
+The latest Rust and Cargo versions must be installed. Update to the latest combined Rust and Cargo Nightly build regularly with the command: ```curl -sS https://static.rust-lang.org/rustup.sh | sudo bash```
 
 It has been tested against the Rust 1.0.0-alpha version and successfully compiles with these Nightly versions:
 
