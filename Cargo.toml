@@ -11,4 +11,4 @@ test = true
 doc = false
 
 [dependencies]
-regex = "*"
+regex = "0.1.20"
